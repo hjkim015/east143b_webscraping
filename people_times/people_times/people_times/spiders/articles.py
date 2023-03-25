@@ -4,34 +4,26 @@ import datetime
 
 class ArticlesSpider(scrapy.Spider):
     name = "articles"
-    start_url = 'https://www.japantimes.co.jp/news/world/page/1/'
+    base = 'http://en.people.cn'
 
     def start_requests(self):
-        urls = [f'https://www.japantimes.co.jp/news/world/page/{page_num}/' 
-                for page_num in range(13, 45)]
-        # urls = ['https://www.japantimes.co.jp/news/world/page/12/']
+        urls = [f'http://en.people.cn/90777/index{page_num}.html' 
+                for page_num in range(21, 63)]
 
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
     
     def parse(self, response):
-        #Calls the parse_article function for each article link 
-        for article_link in response.css('article header p a[href]'):
-            yield response.follow(article_link, callback=self.parse_article)
+        #Gets the specific link for an article, which is just a class
+        for article_link in response.css('div.foreign_d2list ul.foreign_list8 li a::attr(href)').getall(): 
+            yield response.follow(self.base + article_link, callback=self.parse_article)
         
 
     def parse_article(self, response):
         yield {
-            'title': response.xpath("//title/text()").get(),
-            'author': response.xpath("//meta[@name='author']/@content").get(),
-            'date': response.xpath("//time/text()").get().strip(),
-            'content': response.css('.entry p::text').get()
+            'title': response.css('h1::text').get(),
+            'author': response.css('div.origin a::text').get(),
+            'date': response.css('div.origin span::text').get(),
+            'content': ' '.join(response.css('p::text').getall()).replace('\n','').replace('\t', '')
         }
-    
-
-        #Gets all the source code of the urls 
-        # page = response.url.split("/")[-2]
-        # filename = f'articles-{page}.html'
-        # Path(filename).write_bytes(response.body)
-        # self.log(f'Saved file {filename}')
