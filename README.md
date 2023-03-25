@@ -1,7 +1,8 @@
 # east143b_webscraping
 
-Japan Times Articles: japanTimesArticles.CSV \\
-People's Daily Articles: peoplesDailyArticles.CSV \\
+Japan Times Articles: japanTimesArticles.CSV 
+
+People's Daily Articles: peoplesDailyArticles.CSV 
 
 
 Note that I was facing continual issues with my adblocker with Japan Times even after running the webscraper locally, disabiling my adblocker, and restarting chrome. 
